@@ -13,3 +13,8 @@ ktor网络框架集成
 kotlinx.serialization序列化工具集成
 请求脱壳+异常处理+请求API封装
 全局进度弹窗
+### 数据
+#### 数据库
+realm 待集成
+#### 键值对
+multiplatform-settings

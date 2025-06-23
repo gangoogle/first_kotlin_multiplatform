@@ -16,6 +16,7 @@ import org.example.project.view.WeLoadingDialog
 
 @Composable
 fun AppWidget(content: @Composable () -> Unit) {
+
     MaterialTheme {
         val navigator = LocalNavigator.currentOrThrow
         val appModel = navigator.rememberNavigatorScreenModel { AppShareViewModel() }

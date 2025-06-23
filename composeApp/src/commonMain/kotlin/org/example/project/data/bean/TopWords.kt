@@ -1,4 +1,4 @@
-package org.example.project.net
+package org.example.project.data.bean
 
 
 import kotlinx.serialization.SerialName

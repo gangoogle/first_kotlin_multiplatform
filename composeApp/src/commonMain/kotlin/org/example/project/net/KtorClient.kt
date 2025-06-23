@@ -16,6 +16,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.async
+import org.example.project.data.bean.TopWords
 
 object KtorClient {
     lateinit var client: HttpClient
@@ -41,7 +42,7 @@ object UrlConfig {
 
 object ApiServer {
 
-    inline fun <reified T> ktorGet(
+    private inline fun <reified T> get(
         path: String,
         noinline block: suspend () -> T = {
             KtorClient.client.get(path).body<T>()
@@ -50,7 +51,7 @@ object ApiServer {
         CoroutineScope(Dispatchers.IO).async { block() }
     }
 
-    inline fun <reified T> ktorPost(
+    private inline fun <reified T> ktorPost(
         path: String,
         requestBody: Any,
         noinline block: suspend () -> T = {
@@ -64,7 +65,7 @@ object ApiServer {
     }
 
 
-    suspend fun getTestUrl() = ktorGet<List<TopWords>>(UrlConfig.hotKey)()
-    
+    suspend fun getTestUrl() = get<List<TopWords>>(UrlConfig.hotKey)()
+
 
 }

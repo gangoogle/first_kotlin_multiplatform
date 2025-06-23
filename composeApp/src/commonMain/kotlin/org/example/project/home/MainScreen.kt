@@ -13,6 +13,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -22,6 +23,7 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import org.example.project.ext.MyPreview
 import org.example.project.ext.color
 import org.example.project.getPlatform
 import org.example.project.theme.AppWidget
@@ -36,32 +38,37 @@ class MainScreen : Screen {
         LifecycleEffectOnce {
             println("main screen launchedEffect")
             vm.registerEffectMain {
-                if (it is MainScreenModel.Effect.SayHello) {
-                    println("main screen SayHello -> $it")
+                if (it is MainScreenModel.Effect.GetPlatFormName) {
+                    println("平台-> ${platform.name}")
                 }
             }
         }
         AppWidget {
             Column(
-                modifier = Modifier.fillMaxSize(1f),
+                modifier = Modifier.fillMaxSize(1f).background("#f6f8fa".color),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("平台类型 -> ${platform.name}")
                 Button(onClick = {
                     nav.push(AboutUsScreen(type = "main-200"))
                 }) {
                     Text("goto about")
                 }
                 Button(onClick = {
-                    vm.sendEffect(MainScreenModel.Effect.SayHello)
+                    vm.sendEffect(MainScreenModel.Effect.GetPlatFormName)
                 }) {
-                    Text("say hello effect")
+                    Text("获取平台名称")
                 }
                 Button(onClick = {
                     vm.requestHotKey()
                 }) {
                     Text("url request test")
+                }
+                Text("cacheUserName: ${vm.state.cacheName}")
+                Button(onClick = {
+                    vm.insertAppCache()
+                }) {
+                    Text("App Cache Insert")
                 }
                 Column(modifier = Modifier.weight(1f)) {
                     ListBody()
@@ -75,7 +82,7 @@ class MainScreen : Screen {
         val vm = rememberScreenModel { MainScreenModel() }
         LazyColumn(modifier = Modifier.fillMaxSize(1f)) {
             items(vm.state.list.size) {
-                Row(modifier = Modifier.fillMaxWidth(1f).background("#999999".color)) {
+                Row(modifier = Modifier.fillMaxWidth(1f).background("#28b4ff".color)) {
                     Text(vm.state.list[it].name ?: "")
                     Spacer(modifier = Modifier.width(5.dp))
                     Text(vm.state.list[it].link ?: "")
@@ -87,4 +94,10 @@ class MainScreen : Screen {
         }
     }
 
+}
+
+@MyPreview
+@Composable
+private fun PreviewMainScreen103() {
+    MainScreen().ListBody()
 }

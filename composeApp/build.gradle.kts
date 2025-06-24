@@ -65,9 +65,9 @@ kotlin {
             implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
             implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
             implementation("io.ktor:ktor-server-default-headers:$ktor_version")
-
             implementation("com.russhwolf:multiplatform-settings:1.3.0")
             implementation("com.russhwolf:multiplatform-settings-no-arg:1.3.0")
+            implementation("io.realm.kotlin:library-base:1.16.0")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -81,11 +81,11 @@ kotlin {
 }
 
 android {
-    namespace = "org.example.project"
+    namespace = "org.gangoogle.project"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "org.example.project"
+        applicationId = "org.gangoogle.project"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
@@ -116,11 +116,11 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "org.example.project.MainKt"
+        mainClass = "org.gangoogle.project.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "org.example.project"
+            packageName = "org.gangoogle.project"
             packageVersion = "1.0.0"
         }
     }

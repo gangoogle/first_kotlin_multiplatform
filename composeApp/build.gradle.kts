@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeHotReload)
     kotlin("plugin.serialization") version "2.1.20"
+    id("app.cash.sqldelight") version "2.1.0"
 }
 
 kotlin {
@@ -18,7 +19,6 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-
     listOf(
         iosX64(),
         iosArm64(),
@@ -35,16 +35,18 @@ kotlin {
     sourceSets {
         val desktopMain by getting
         val ktor_version = "3.1.3"
-
+        val file_pick = "0.10.0-beta04"
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation("io.ktor:ktor-client-android:$ktor_version")
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
+            implementation("app.cash.sqldelight:android-driver:2.1.0")
         }
         iosMain.dependencies {
             implementation("io.ktor:ktor-client-darwin:$ktor_version")
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
+            implementation("app.cash.sqldelight:native-driver:2.1.0")
         }
         commonMain.dependencies {
             val voyagerVersion = "1.1.0-beta02"
@@ -61,13 +63,23 @@ kotlin {
             implementation("cafe.adriel.voyager:voyager-bottom-sheet-navigator:$voyagerVersion")
             implementation("cafe.adriel.voyager:voyager-tab-navigator:$voyagerVersion")
             implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVersion")
+            implementation("cafe.adriel.voyager:voyager-lifecycle-kmp:${voyagerVersion}")
             implementation("io.ktor:ktor-client-core:$ktor_version")
             implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
             implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
             implementation("io.ktor:ktor-server-default-headers:$ktor_version")
             implementation("com.russhwolf:multiplatform-settings:1.3.0")
             implementation("com.russhwolf:multiplatform-settings-no-arg:1.3.0")
-            implementation("io.realm.kotlin:library-base:1.16.0")
+            implementation("app.cash.sqldelight:runtime:2.1.0")
+            implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.9.1")
+            implementation("io.coil-kt.coil3:coil-compose:3.2.0")
+            implementation("io.coil-kt.coil3:coil-svg:3.2.0")
+            implementation("io.coil-kt.coil3:coil-network-okhttp:3.2.0")
+            implementation("io.github.vinceglb:filekit-core:$file_pick")
+            implementation("io.github.vinceglb:filekit-dialogs-compose:$file_pick")
+            implementation("io.github.vinceglb:filekit-coil:$file_pick")
+            implementation("io.github.dokar3:sonner:0.3.8")
+            implementation("io.github.g0dkar:qrcode-kotlin:4.1.1")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -76,6 +88,7 @@ kotlin {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
             implementation("io.ktor:ktor-client-apache5:$ktor_version")
+            implementation("app.cash.sqldelight:sqlite-driver:2.1.0")
         }
     }
 }
@@ -117,11 +130,21 @@ dependencies {
 compose.desktop {
     application {
         mainClass = "org.gangoogle.project.MainKt"
-
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "org.gangoogle.project"
             packageVersion = "1.0.0"
+            linux {
+                modules("jdk.security.auth")
+            }
+        }
+    }
+}
+
+sqldelight {
+    databases {
+        create("AppDatabase") {
+            packageName.set("org.gangoogle.database")
         }
     }
 }

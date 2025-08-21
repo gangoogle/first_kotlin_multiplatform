@@ -24,7 +24,7 @@ object KtorClient {
     fun init() {
         client = HttpClient() {
             defaultRequest {
-                url.takeFrom(UrlConfig.baseUrl)
+                url.takeFrom(UrlDispatcher.getBaseUrl())
                 header("WarehouseCode", "YDSHA")
             }
             install(ContentNegotiation) {
@@ -35,37 +35,4 @@ object KtorClient {
     }
 }
 
-object UrlConfig {
-    val baseUrl = "https://www.wanandroid.com//"
-    val hotKey = "hotkey/json"
-}
 
-object ApiServer {
-
-    private inline fun <reified T> get(
-        path: String,
-        noinline block: suspend () -> T = {
-            KtorClient.client.get(path).body<T>()
-        }
-    ): suspend () -> Deferred<T> = {
-        CoroutineScope(Dispatchers.IO).async { block() }
-    }
-
-    private inline fun <reified T> ktorPost(
-        path: String,
-        requestBody: Any,
-        noinline block: suspend () -> T = {
-            KtorClient.client.post {
-                url.takeFrom(path)
-                setBody(requestBody)
-            }.body<T>()
-        }
-    ): suspend () -> Deferred<T> = {
-        CoroutineScope(Dispatchers.IO).async { block() }
-    }
-
-
-    suspend fun getTestUrl() = get<List<TopWords>>(UrlConfig.hotKey)()
-
-
-}

@@ -10,6 +10,9 @@ import kotlinx.serialization.json.*
 import kotlinx.serialization.*
 import kotlinx.serialization.serializer  // ← 一定要加这一行
 
+/**
+ * 数据脱壳
+ */
 class AutoUnwrapKotlinxConverter(
     private val json: Json = Json { ignoreUnknownKeys = true; prettyPrint = true }
 ) : ContentConverter {
@@ -56,7 +59,6 @@ class AutoUnwrapKotlinxConverter(
             val msg = jsonObject[msgKey]?.jsonPrimitive?.content ?: "未知错误"
             throw ResponseException("请求失败: $msg (code=$code)")
         }
-
         // 如果没有 data 字段，则返回 true
         if (dataKey !in jsonObject) return true
         // 最后反序列化 data 字段

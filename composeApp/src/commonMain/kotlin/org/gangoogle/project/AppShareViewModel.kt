@@ -9,6 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import org.gangoogle.project.AppShareViewModel.Effect
 import org.gangoogle.project.ext.launchIO
 import org.gangoogle.project.ext.launchMain
 import org.gangoogle.project.ext.obs
@@ -39,6 +40,7 @@ class AppShareViewModel : ScreenModel {
     //发送事件
     fun sendEffect(event: Effect) {
         screenModelScope.launch {
+            println("AppShareViewModel  sendEffect ->${event}")
             _effect.emit(event)
         }
     }
@@ -49,7 +51,7 @@ class AppShareViewModel : ScreenModel {
     }
 
     sealed class Effect {
-
+        data class ShowToast(val msg: String) : Effect()
     }
 
 }
@@ -60,6 +62,8 @@ fun showLoading() {
 
 fun hideLoading() {
     appShareViewModel?.apply { state.showLoading = false }
-
 }
 
+fun showToast(msg: String) {
+    appShareViewModel?.sendEffect(Effect.ShowToast(msg))
+}

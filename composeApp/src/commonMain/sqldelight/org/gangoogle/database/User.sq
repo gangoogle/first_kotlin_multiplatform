@@ -1,0 +1,11 @@
+CREATE TABLE User (
+   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+             serviceIp TEXT NOT NULL
+);
+
+
+queryAll:
+SELECT * FROM User;
+
+insert:
+INSERT INTO User (serviceIp) VALUES (?);

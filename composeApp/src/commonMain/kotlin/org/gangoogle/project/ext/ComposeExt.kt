@@ -1,10 +1,13 @@
 package org.gangoogle.project.ext
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableDoubleState
 import androidx.compose.runtime.MutableFloatState
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableLongState
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.cache
+import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -21,6 +24,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
@@ -108,3 +112,116 @@ fun CoroutineScope.launchDefault(block: suspend CoroutineScope.() -> Unit) {
 fun CoroutineScope.launchIO(block: suspend CoroutineScope.() -> Unit) {
     this.launch(Dispatchers.IO, block = block)
 }
+
+/**
+ * 切换到主线程调度器
+ */
+suspend fun <T> withMain(block: suspend CoroutineScope.() -> T) = withContext(Dispatchers.Main, block)
+
+/**
+ * 切换到IO程调度器
+ */
+suspend fun <T> withIO(block: suspend CoroutineScope.() -> T) = withContext(Dispatchers.IO, block)
+
+/**
+ * 切换到默认调度器
+ */
+suspend fun <T> withDefault(block: suspend CoroutineScope.() -> T) = withContext(Dispatchers.Default, block)
+
+/**
+ * 切换到没有限制的调度器
+ */
+suspend fun <T> withUnconfined(block: suspend CoroutineScope.() -> T) = withContext(Dispatchers.Unconfined, block)
+
+
+
+
+
+
+@Composable
+fun <T> obsCache(t: T): MutableState<T> {
+    return currentComposer.cache(false) {
+        mutableStateOf(t)
+    }
+}
+
+
+@Composable
+fun <T> listObsCache(vararg t: T): SnapshotStateList<T> {
+    return currentComposer.cache(false) {
+        mutableStateListOf<T>(elements = t)
+    }
+}
+
+
+@Composable
+fun <T> listObsRemember(vararg t: T): SnapshotStateList<T> {
+    return currentComposer.cache(false) {
+        mutableStateListOf<T>(elements = t)
+    }
+}
+
+@Composable
+fun <K, V> mapObsCache(): SnapshotStateMap<K, V> {
+    return currentComposer.cache(false) {
+        mutableStateMapOf()
+    }
+}
+
+@Composable
+fun <K, V> mapObsCache(vararg t: Pair<K, V>): SnapshotStateMap<K, V> {
+    return currentComposer.cache(false) {
+        mutableStateMapOf<K, V>(*t)
+    }
+}
+
+val <T> Collection<T>.obsCache: SnapshotStateList<T>
+    @Composable
+    get() = currentComposer.cache(false) {
+        this.toMutableStateList()
+    }
+
+val <K, V> Iterable<Pair<K, V>>.obsCache: SnapshotStateMap<K, V>
+    @Composable
+    get() = currentComposer.cache(false) {
+        this.toMutableStateMap()
+    }
+
+
+val Boolean.obsCache: MutableState<Boolean>
+    @Composable
+    get() = currentComposer.cache(false) {
+        mutableStateOf(this)
+    }
+
+
+val Int.obsCache: MutableIntState
+    @Composable
+    get() = currentComposer.cache(false) {
+        mutableIntStateOf(this)
+    }
+
+val Double.obsCache: MutableDoubleState
+    @Composable
+    get() = currentComposer.cache(false) {
+        mutableDoubleStateOf(this)
+    }
+
+val String.obsCache: MutableState<String>
+    @Composable
+    get() = currentComposer.cache(false) {
+        mutableStateOf(this)
+    }
+
+
+val Float.obsCache: MutableFloatState
+    @Composable
+    get() = currentComposer.cache(false) {
+        mutableFloatStateOf(this)
+    }
+
+val Long.obsCache: MutableLongState
+    @Composable
+    get() = currentComposer.cache(false) {
+        mutableLongStateOf(this)
+    }

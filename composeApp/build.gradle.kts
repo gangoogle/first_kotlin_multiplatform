@@ -8,8 +8,8 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeHotReload)
-    kotlin("plugin.serialization") version "2.1.20"
-    id("app.cash.sqldelight") version "2.1.0"
+    alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.sqldelight)
 }
 
 kotlin {
@@ -20,13 +20,13 @@ kotlin {
         }
     }
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
+            linkerOpts("-lsqlite3")
         }
     }
 
@@ -34,52 +34,56 @@ kotlin {
 
     sourceSets {
         val desktopMain by getting
-        val ktor_version = "3.1.3"
-        val file_pick = "0.10.0-beta04"
+        val ktorVersion = libs.versions.ktor.get()
+        val serializationVersion = libs.versions.kotlinx.serialization.get()
+        val sqlDelightVersion = libs.versions.sqldelight.get()
+        val coilVersion = libs.versions.coil.get()
+        val fileKitVersion = libs.versions.filekit.get()
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
-            implementation("io.ktor:ktor-client-android:$ktor_version")
-            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
-            implementation("app.cash.sqldelight:android-driver:2.1.0")
+            implementation("io.ktor:ktor-client-android:$ktorVersion")
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
+            implementation("app.cash.sqldelight:android-driver:$sqlDelightVersion")
+            implementation("io.coil-kt.coil3:coil-network-okhttp:$coilVersion")
         }
         iosMain.dependencies {
-            implementation("io.ktor:ktor-client-darwin:$ktor_version")
-            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
-            implementation("app.cash.sqldelight:native-driver:2.1.0")
+            implementation("io.ktor:ktor-client-darwin:$ktorVersion")
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
+            implementation("app.cash.sqldelight:native-driver:$sqlDelightVersion")
+            implementation("io.coil-kt.coil3:coil-network-ktor3:$coilVersion")
         }
         commonMain.dependencies {
-            val voyagerVersion = "1.1.0-beta02"
+            val voyagerVersion = libs.versions.voyager.get()
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
+            implementation(compose.material)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:${libs.versions.kotlinx.datetime.get()}")
             implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVersion")
             implementation("cafe.adriel.voyager:voyager-screenmodel:$voyagerVersion")
             implementation("cafe.adriel.voyager:voyager-bottom-sheet-navigator:$voyagerVersion")
             implementation("cafe.adriel.voyager:voyager-tab-navigator:$voyagerVersion")
             implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVersion")
             implementation("cafe.adriel.voyager:voyager-lifecycle-kmp:${voyagerVersion}")
-            implementation("io.ktor:ktor-client-core:$ktor_version")
-            implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
-            implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
-            implementation("io.ktor:ktor-server-default-headers:$ktor_version")
-            implementation("com.russhwolf:multiplatform-settings:1.3.0")
-            implementation("com.russhwolf:multiplatform-settings-no-arg:1.3.0")
-            implementation("app.cash.sqldelight:runtime:2.1.0")
-            implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.9.1")
-            implementation("io.coil-kt.coil3:coil-compose:3.2.0")
-            implementation("io.coil-kt.coil3:coil-svg:3.2.0")
-            implementation("io.coil-kt.coil3:coil-network-okhttp:3.2.0")
-            implementation("io.github.vinceglb:filekit-core:$file_pick")
-            implementation("io.github.vinceglb:filekit-dialogs-compose:$file_pick")
-            implementation("io.github.vinceglb:filekit-coil:$file_pick")
-            implementation("io.github.dokar3:sonner:0.3.8")
-            implementation("io.github.g0dkar:qrcode-kotlin:4.1.1")
+            implementation("io.ktor:ktor-client-core:$ktorVersion")
+            implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+            implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+            implementation("com.russhwolf:multiplatform-settings:${libs.versions.multiplatform.settings.get()}")
+            implementation("com.russhwolf:multiplatform-settings-no-arg:${libs.versions.multiplatform.settings.get()}")
+            implementation("app.cash.sqldelight:runtime:$sqlDelightVersion")
+            implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:${libs.versions.androidx.lifecycle.get()}")
+            implementation("io.coil-kt.coil3:coil-compose:$coilVersion")
+            implementation("io.coil-kt.coil3:coil-svg:$coilVersion")
+            implementation("io.github.vinceglb:filekit-core:$fileKitVersion")
+            implementation("io.github.vinceglb:filekit-dialogs-compose:$fileKitVersion")
+            implementation("io.github.vinceglb:filekit-coil:$fileKitVersion")
+            implementation("io.github.g0dkar:qrcode-kotlin:${libs.versions.qrcode.get()}")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -87,8 +91,9 @@ kotlin {
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
-            implementation("io.ktor:ktor-client-apache5:$ktor_version")
-            implementation("app.cash.sqldelight:sqlite-driver:2.1.0")
+            implementation("io.ktor:ktor-client-apache5:$ktorVersion")
+            implementation("app.cash.sqldelight:sqlite-driver:$sqlDelightVersion")
+            implementation("io.coil-kt.coil3:coil-network-okhttp:$coilVersion")
         }
     }
 }

@@ -2,8 +2,9 @@ package org.gangoogle.project.theme
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -14,8 +15,7 @@ import cafe.adriel.voyager.core.model.rememberNavigatorScreenModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.dokar.sonner.Toaster
-import com.dokar.sonner.rememberToasterState
+import androidx.compose.runtime.remember
 import org.gangoogle.project.AppShareViewModel
 import org.gangoogle.project.appShareViewModel
 import org.gangoogle.project.view.WeLoadingDialog
@@ -29,18 +29,18 @@ fun Screen.AppWidget(content: @Composable () -> Unit) {
         val scope = rememberCoroutineScope()
         appShareViewModel = appModel
         WeLoadingDialog(appModel.state.showLoading)
-        val toaster = rememberToasterState()
+        val snackbarHostState = remember { SnackbarHostState() }
         LaunchedEffect(scope) {
             //每次页面切换都会创建新的scope
             appShareViewModel?.registerEffectMain(scope) {
                 when (it) {
                     is AppShareViewModel.Effect.ShowToast -> {
-                        toaster.show(it.msg)
+                        snackbarHostState.showSnackbar(it.msg)
                     }
                 }
             }
         }
-        Toaster(toaster)
+        SnackbarHost(snackbarHostState)
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,

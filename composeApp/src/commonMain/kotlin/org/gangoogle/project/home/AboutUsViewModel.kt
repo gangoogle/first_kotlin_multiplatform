@@ -1,7 +1,7 @@
 package org.gangoogle.project.home
 
 import androidx.compose.runtime.Immutable
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 import org.gangoogle.database.User
 import org.gangoogle.project.base.BaseComposeVM
 import org.gangoogle.project.base.BaseEffect

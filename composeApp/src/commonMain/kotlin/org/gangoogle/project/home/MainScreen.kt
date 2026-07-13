@@ -46,8 +46,6 @@ import coil3.compose.LocalPlatformContext
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.svg.SvgDecoder
-import com.dokar.sonner.Toaster
-import com.dokar.sonner.rememberToasterState
 import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
 import kotlinproject.composeapp.generated.resources.Res
 import org.gangoogle.project.base.currentNavigator
@@ -201,6 +199,6 @@ class MainScreen : Screen {
 
 @Preview
 @Composable
-fun previewMain() {
+fun PreviewMain() {
     MainScreen().Content()
 }

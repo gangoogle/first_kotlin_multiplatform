@@ -6,8 +6,10 @@ import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import org.gangoogle.project.AppShareViewModel.Effect
 import org.gangoogle.project.ext.launchIO
@@ -65,5 +67,11 @@ fun hideLoading() {
 }
 
 fun showToast(msg: String) {
-    appShareViewModel?.sendEffect(Effect.ShowToast(msg))
+    appEffectChannel.trySend(Effect.ShowToast(msg))
+}
+
+private val appEffectChannel = Channel<Effect>(capacity = Channel.UNLIMITED)
+
+internal suspend fun collectAppEffects(block: suspend (Effect) -> Unit) {
+    appEffectChannel.receiveAsFlow().collect(block)
 }

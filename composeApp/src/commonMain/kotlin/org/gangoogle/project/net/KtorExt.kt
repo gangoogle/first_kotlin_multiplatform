@@ -1,7 +1,5 @@
 package org.gangoogle.project.net
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -27,14 +25,6 @@ suspend inline fun <reified T, reified Req> HttpClient.postUnwrapped(
         contentType(ContentType.Application.Json)
         setBody(requestBody)
     }.body()
-}
-
-fun ViewModel.scopeNetLife(
-    dispatcher: CoroutineDispatcher = Dispatchers.Main,
-    request: suspend CoroutineScope.() -> Unit,
-    onFinish: (error: Throwable?) -> Unit = {},
-) {
-    this.viewModelScope.scopeNetLife(dispatcher, request, onFinish)
 }
 
 fun CoroutineScope.scopeNetLife(

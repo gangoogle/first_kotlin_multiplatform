@@ -3,13 +3,13 @@ package org.gangoogle.project.home
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.viewModelScope
+import cafe.adriel.voyager.core.model.screenModelScope
+import kotlin.random.Random
 import org.gangoogle.project.base.BaseEffect
+import org.gangoogle.project.base.BaseScreenModel
 import org.gangoogle.project.base.BaseState
-import org.gangoogle.project.base.BaseComposeVM
 import org.gangoogle.project.data.bean.TopWords
 import org.gangoogle.project.data.cache.AppCache
-import org.gangoogle.project.ext.launchIO
 import org.gangoogle.project.ext.launchMain
 import org.gangoogle.project.ext.listObs
 import org.gangoogle.project.ext.obs
@@ -21,29 +21,21 @@ import org.gangoogle.project.showLoading
 import org.gangoogle.project.showToast
 import qrcode.QRCode
 import qrcode.color.Colors
-import qrcode.render.QRCodeGraphics
-import kotlin.random.Random
 
-class MainViewModel : BaseComposeVM<MainViewModel.State, MainViewModel.Effect>(State()) {
+class MainScreenModel : BaseScreenModel<MainScreenModel.State, MainScreenModel.Effect>(State()) {
 
     @Immutable
     class State : BaseState() {
         var list = listObs<TopWords>()
-        var cacheName by obs<String>("")
+        var cacheName by obs("")
         var qrCode by obs<ByteArray?>(null)
-    }
-
-    init {
-        println("mainScreenModel init")
-        initData()
     }
 
     sealed class Effect : BaseEffect() {
         data object GetPlatFormName : Effect()
     }
 
-
-    private fun initData() {
+    init {
         state.cacheName = AppCache.userName
         createQrCode()
     }
@@ -55,20 +47,21 @@ class MainViewModel : BaseComposeVM<MainViewModel.State, MainViewModel.Effect>(S
 
     fun requestHotKey() {
         showLoading()
-        scopeNetLife(request = {
-            val hotKey = ApiServer.getHotKey().await()
-            state.list.clear()
-            state.list.addAll(hotKey)
-        }, onFinish = { error ->
-            hideLoading()
-            error?.let {
-                showToast("onError:" + it.message)
-            }
-        })
+        screenModelScope.scopeNetLife(
+            request = {
+                val hotKey = ApiServer.getHotKey().await()
+                state.list.clear()
+                state.list.addAll(hotKey)
+            },
+            onFinish = { error ->
+                hideLoading()
+                error?.let { showToast("onError:${it.message}") }
+            },
+        )
     }
 
-    fun createQrCode() {
-        viewModelScope.launchMain {
+    private fun createQrCode() {
+        screenModelScope.launchMain {
             val graphics = withIO {
                 QRCode.ofSquares().withColor(Colors.BLACK).build("Hello World").render()
             }
@@ -76,6 +69,4 @@ class MainViewModel : BaseComposeVM<MainViewModel.State, MainViewModel.Effect>(S
             println("qrcode create ${state.qrCode?.size}")
         }
     }
-
-
 }
